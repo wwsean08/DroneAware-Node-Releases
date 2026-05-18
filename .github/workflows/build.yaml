@@ -1,0 +1,53 @@
+name: Reusable Build
+on:
+  workflow_call:
+    inputs:
+      version:
+        default: dev
+        type: string
+      publish:
+        default: false
+        type: boolean
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pguyot/arm-runner-action@29ff97a269fc6ef3e98f17583af01253896c5601
+        with:
+          base_image: "raspios_lite_arm64:latest"
+          cpu_info: raspberrypi_3b
+          cpu: cortex-a7
+          copy_artifact_path: *
+          commands: |
+            bash ./build.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          path: dist/
+          overwrite: true
+  release:
+    needs: build
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      # Contents write is required to create a release
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v7
+      - uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/ble_feeder
+            dist/wifi_feeder
+            install.sh
+            droneaware
+      - name: Create Release
+        run: |
+          gh release create "v${VERSION}" dist/* install.sh droneaware --title "Release v${VERSION}" --generate-notes
+        env:
+          VERSION: ${{ inputs.version }}
