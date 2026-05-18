@@ -13,6 +13,11 @@ on:
 jobs:
   build-and-publish:
     uses: ./.github/workflows/build.yaml
+    permissions:
+      # Contents write is required to create a release
+      contents: write
+      id-token: write
+      attestations: write
     with:
       version: ${{ inputs.version }}
       publish: ${{ inputs.publish }}

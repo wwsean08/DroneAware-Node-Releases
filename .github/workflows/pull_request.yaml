@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
+    permissions:
+      contents: read
     with:
       version: pr-${{ github.event.pull_request.number }}
       publish: false
