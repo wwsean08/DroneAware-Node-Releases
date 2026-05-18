@@ -1,4 +1,16 @@
 name: Release
 on:
-
+  workflow_call:
+    inputs:
+      version:
+          required: true
+          type: string
+      publish:
+        default: true
+        type: boolean
 jobs:
+  build-and-publish:
+    uses: .github/workflows/build.yaml
+    with:
+      version: ${{ inputs.version }}
+      publish: ${{ inputs.publish }}
