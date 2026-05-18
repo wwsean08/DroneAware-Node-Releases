@@ -20,7 +20,7 @@ jobs:
           base_image: "raspios_lite_arm64:latest"
           cpu_info: raspberrypi_3b
           cpu: cortex-a7
-          copy_artifact_path: *
+          copy_artifact_path: dist/
           commands: |
             bash ./build.sh
       - uses: actions/upload-artifact@v7
